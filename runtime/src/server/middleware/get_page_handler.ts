@@ -275,7 +275,7 @@ export function get_page_handler(
 			].filter(Boolean).join(',')}};`;
 
 			if (has_service_worker) {
-				script += `if('serviceWorker' in navigator)navigator.serviceWorker.register('${req.baseUrl}/service-worker.js');`;
+				script += `window.isUpdateAvailable = new Promise(function(resolve, reject){if('serviceWorker' in navigator)navigator.serviceWorker.register('${req.baseUrl}/service-worker.js').then(reg => {reg.onupdatefound = () => {const installingWorker = reg.installing;installingWorker.onstatechange = () => {switch (installingWorker.state) {case 'installed':if (navigator.serviceWorker.controller) resolve(true); else resolve(false); break;}};};}).catch(err => console.error('[SW ERROR]', err));});`;
 			}
 
 			const file = [].concat(build_info.assets.main).filter(file => file && /\.js$/.test(file))[0];
